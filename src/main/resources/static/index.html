@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚗 Estoque de Veículos - Sistema</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+<!-- Cabeçalho -->
+<header class="header">
+    <div class="container">
+        <h1><i class="fas fa-car"></i> Estoque de Veículos</h1>
+        <p>Sistema de gerenciamento completo</p>
+    </div>
+</header>
+
+<!-- Menu de Navegação -->
+<nav class="navbar">
+    <div class="container">
+        <ul>
+            <li><a href="#veiculos" class="nav-link active" data-section="veiculos">Veículos</a></li>
+            <li><a href="#marcas" class="nav-link" data-section="marcas">Marcas</a></li>
+            <li><a href="#modelos" class="nav-link" data-section="modelos">Modelos</a></li>
+            <li><a href="#relatorios" class="nav-link" data-section="relatorios">Relatórios</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+    <!-- SEÇÃO: VEÍCULOS -->
+    <section id="veiculos" class="section active">
+        <div class="section-header">
+            <h2><i class="fas fa-list"></i> Gerenciar Veículos</h2>
+            <button class="btn btn-primary" onclick="abrirModalVeiculo()">
+                <i class="fas fa-plus"></i> Novo Veículo
+            </button>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filters">
+            <input type="text" id="filtroGeral" placeholder="Buscar por marca, modelo..."
+                   onkeyup="filtrarVeiculos()">
+            <select id="filtroStatus" onchange="filtrarVeiculos()">
+                <option value="">Todos os status</option>
+                <option value="disponível">Disponível</option>
+                <option value="vendido">Vendido</option>
+                <option value="reservado">Reservado</option>
+            </select>
+            <button class="btn btn-secondary" onclick="limparFiltros()">
+                <i class="fas fa-times"></i> Limpar
+            </button>
+        </div>
+
+        <!-- Lista de Veículos -->
+        <div id="listaVeiculos" class="cards-container">
+            <!-- Os veículos serão carregados aqui via JavaScript -->
+            <div class="loading">Carregando veículos...</div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO: MARCAS -->
+    <section id="marcas" class="section">
+        <div class="section-header">
+            <h2><i class="fas fa-tags"></i> Gerenciar Marcas</h2>
+            <button class="btn btn-primary" onclick="abrirModalMarca()">
+                <i class="fas fa-plus"></i> Nova Marca
+            </button>
+        </div>
+        <div id="listaMarcas" class="cards-container"></div>
+    </section>
+
+    <!-- SEÇÃO: MODELOS -->
+    <section id="modelos" class="section">
+        <div class="section-header">
+            <h2><i class="fas fa-car-side"></i> Gerenciar Modelos</h2>
+            <button class="btn btn-primary" onclick="abrirModalModelo()">
+                <i class="fas fa-plus"></i> Novo Modelo
+            </button>
+        </div>
+        <div id="listaModelos" class="cards-container"></div>
+    </section>
+
+    <!-- SEÇÃO: RELATÓRIOS -->
+    <section id="relatorios" class="section">
+        <div class="section-header">
+            <h2><i class="fas fa-chart-bar"></i> Relatórios</h2>
+        </div>
+
+        <div class="reports-grid">
+            <div class="report-card">
+                <h3><i class="fas fa-chart-pie"></i> Status dos Veículos</h3>
+                <div id="relatorioStatus" class="report-content"></div>
+                <button class="btn btn-secondary" onclick="carregarRelatorioStatus()">
+                    <i class="fas fa-sync"></i> Atualizar
+                </button>
+            </div>
+
+            <div class="report-card">
+                <h3><i class="fas fa-money-bill-wave"></i> Valor em Estoque</h3>
+                <div id="relatorioValor" class="report-content"></div>
+                <button class="btn btn-secondary" onclick="carregarRelatorioValor()">
+                    <i class="fas fa-sync"></i> Atualizar
+                </button>
+            </div>
+        </div>
+    </section>
+</div>
+
+<
+<div id="modalVeiculo" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="tituloModalVeiculo">Cadastrar Veículo</h3>
+            <span class="close" onclick="fecharModalVeiculo()">&times;</span>
+        </div>
+
+        <style>
+            #formVeiculo { padding: 1.5rem; }
+        </style>
+
+        <form id="formVeiculo" onsubmit="salvarVeiculo(event)">
+            <input type="hidden" id="veiculoId">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="marcaVeiculo">Marca *</label>
+                    <select id="marcaVeiculo" required onchange="carregarModelosPorMarca()">
+                        <option value="">Selecione uma marca</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="modeloVeiculo">Modelo *</label>
+                    <select id="modeloVeiculo" required>
+                        <option value="">Primeiro selecione uma marca</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="ano">Ano *</label>
+                    <input type="number" id="ano" min="1900" max="2030" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="preco">Preço (R$) *</label>
+                    <input type="number" id="preco" step="0.01" min="0" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="cor">Cor *</label>
+                    <input type="text" id="cor" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="quilometragem">Quilometragem</label>
+                    <input type="number" id="quilometragem" step="0.1" min="0">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="status">Status *</label>
+                <select id="status" required>
+                    <option value="disponível">Disponível</option>
+                    <option value="vendido">Vendido</option>
+                    <option value="reservado">Reservado</option>
+                </select>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="fecharModalVeiculo()">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL: MARCAS -->
+<div id="modalMarca" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Nova Marca</h3>
+            <span class="close" onclick="fecharModalMarca()">&times;</span>
+        </div>
+        <form id="formMarca" onsubmit="salvarMarca(event)">
+            <div class="form-group">
+                <label for="nomeMarca">Nome da Marca *</label>
+                <input type="text" id="nomeMarca" required>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="fecharModalMarca()">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL: MODELOS -->
+<div id="modalModelo" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="tituloModalModelo">Novo Modelo</h3>
+            <span class="close" onclick="fecharModalModelo()">&times;</span>
+        </div>
+        <form id="formModelo" onsubmit="salvarModelo(event)">
+            <input type="hidden" id="modeloId">
+
+            <div class="form-group">
+                <label for="nomeModelo">Nome do Modelo *</label>
+                <input type="text" id="nomeModelo" required>
+            </div>
+
+            <div class="form-group">
+                <label for="marcaModelo">Marca *</label>
+                <select id="marcaModelo" required>
+                    <option value="">Selecione uma marca</option>
+                    <!-- As marcas serão carregadas via JavaScript -->
+                </select>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="fecharModalModelo()">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Toast de Notificação -->
+<div id="toast" class="toast"></div>
+
+<script src="/js/app.js"></script>
+</body>
+</html>
