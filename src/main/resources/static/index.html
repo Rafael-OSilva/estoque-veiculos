@@ -184,10 +184,13 @@
 <div id="modalMarca" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3>Nova Marca</h3>
+            <h3 id="tituloModalMarca">Nova Marca</h3>
             <span class="close" onclick="fecharModalMarca()">&times;</span>
         </div>
         <form id="formMarca" onsubmit="salvarMarca(event)">
+
+            <input type="hidden" id="marcaId">
+
             <div class="form-group">
                 <label for="nomeMarca">Nome da Marca *</label>
                 <input type="text" id="nomeMarca" required>

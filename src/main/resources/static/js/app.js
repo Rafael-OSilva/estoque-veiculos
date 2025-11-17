@@ -591,21 +591,30 @@ async function carregarRelatorioStatus() {
 async function carregarRelatorioValor() {
     try {
         const response = await fetch(`${API_BASE_URL}/veiculos/relatorio/valor-estoque`);
-        const valor = await response.json(); // Assumindo que o backend retorna um número
 
-        const valorFormatado = valor.toLocaleString("pt-BR", {
+        // 1. Pega o objeto JSON (ex: {"valorTotal": 120000.00})
+        const data = await response.json();
+
+        // 2. Acessa o NÚMERO *dentro* do objeto.
+        //    (Estou assumindo que o nome da propriedade é "valorTotal".
+        //     Se não funcionar, pode ser "valor" ou "total".
+        //     Confira na aba "Rede" do F12 qual é o nome certo.)
+        const valorNumerico = data.valorTotal;
+
+        // 3. Formata o NÚMERO, e não o objeto
+        const valorFormatado = valorNumerico.toLocaleString("pt-BR", {
             style: "currency",
             currency: "BRL"
         });
 
         document.getElementById("relatorioValor").innerHTML =
             `<h3>Valor Total em Estoque: ${valorFormatado}</h3>`;
+
     } catch (err) {
         console.error("Erro Relatório Valor:", err);
         document.getElementById("relatorioValor").innerHTML = "<p style='color:red'>Erro ao carregar relatório de valor.</p>";
     }
 }
-
 // ================= UTILITÁRIOS ==================
 function showLoading(id) {
     document.getElementById(id).innerHTML = `<div class="loading">Carregando...</div>`;
